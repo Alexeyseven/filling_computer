@@ -27,7 +27,7 @@ conn6, addr6 = s.accept()
 
 os.system('start cmd /k python valve_19_20_21.py')
 conn7, addr7 = s.accept()
-'''
+
 os.system('start cmd /k python valve_22_23_24.py')
 conn8, addr8 = s.accept()
 
@@ -93,7 +93,7 @@ conn28, addr28 = s.accept()
 
 os.system('start cmd /k python valve_85_86_87.py')
 conn29, addr29 = s.accept()
-'''
+
 os.system('start cmd /k python encoder.py')
 conn30, addr30 = s.accept()
 
@@ -126,8 +126,7 @@ valves = [[0, conn1, 'valve_1'],
           [34, conn6, 'valve_3'],
           [36, conn7, 'valve_1'],
           [38, conn7, 'valve_2'],
-          [40, conn7, 'valve_3']]
-'''
+          [40, conn7, 'valve_3'],
           [42, conn8, 'valve_1'],
           [44, conn8, 'valve_2'],
           [46, conn8, 'valve_3'],
@@ -194,7 +193,7 @@ valves = [[0, conn1, 'valve_1'],
           [168, conn29, 'valve_1'],
           [170, conn29, 'valve_2'],
           [172, conn29, 'valve_3']]
-'''
+
 
 def send_data(i, conn, valve):
     if i in sectors.keys():

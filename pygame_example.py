@@ -9,6 +9,13 @@ RES = WIDTH, HEIGHT = 400, 400
 H_WIDTH, H_HEIGHT = WIDTH // 2, HEIGHT // 2
 RADIUS = H_HEIGHT - 50
 
+sectors = {0: 'start_pos',
+           10: 'CO2',
+           60: 'slow_filling',
+           120: 'fast_filling',
+           310: 'press_reset',
+           340: 'start_pos'}
+
 pygame.init()
 surface = pygame.display.set_mode(RES)
 
@@ -25,6 +32,15 @@ os.system('start cmd /k python encoder.py')
 
 conn1, addr1 = s.accept()
 conn3, addr3 = s.accept()
+
+valves = [[0, conn1, 'valve_1'],
+          [120, conn1, 'valve_2'],
+          [240, conn1, 'valve_3']]
+
+
+def send_data(i, conn, valve):
+    if 360-i in sectors.keys():
+        conn.send(str.encode(f'{valve}'+'_'+f'{sectors[360-i]}'))
 
 
 def get_clock_pos(clock_dict, clock_hand):
@@ -46,30 +62,9 @@ while True:
     surface.fill([235, 235, 235])
 
     i = int(data.decode('cp1251'))
-    if i == 0:
-        conn1.send(b'valve_1_start_pos')
-    if i == 2:
-        conn1.send(b'valve_2_start_pos')    
-    if i == 5:
-        conn1.send(b'valve_1_CO2')
-    if i == 7:
-        conn1.send(b'valve_2_CO2')
-    if i == 9:
-        conn1.send(b'valve_1_slow_filling')
-    if i == 17:
-        conn1.send(b'valve_2_slow_filling')
-    if i == 19:
-        conn1.send(b'valve_1_fast_filling')
-    if i == 37:
-        conn1.send(b'valve_2_fast_filling')
-    if i == 39:
-        conn1.send(b'valve_1_press_reset')
-    if i == 87:
-        conn1.send(b'valve_2_press_reset')    
-    if i == 95:
-        conn1.send(b'valve_1_start_pos')
-    if i == 97:
-        conn1.send(b'valve_2_start_pos')
+
+    for j in valves:
+        send_data(360-i+j[0], j[1], j[2])
 
     text = font.render(f'{str(i)}', True, (180, 0, 0))
     surface.blit(text, (20, 10))

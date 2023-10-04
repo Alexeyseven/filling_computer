@@ -7,8 +7,5 @@ i = 0
 
 
 while True:
-    if i == 360:
-        i = 0
-    s.send(str.encode(f'{i}'))
-    i += 1
+    s.send(str.encode(f'{1}'))
     time.sleep(0.08)
