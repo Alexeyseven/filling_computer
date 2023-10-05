@@ -14,11 +14,8 @@ surface = pygame.display.set_mode(RES)
 
 clock60 = dict(zip(range(360), range(0, 360, 1)))
 
-i = 0
-shift_j = False
-j = 0
-shift_k = False
-k = 0
+encoder = 0
+register = [[False, 0, 0], [False, 10, 0], [False, 20, 0], [False, 30, 0]]
 
 s = socket.socket()
 s.bind(('192.168.1.241', 2000))
@@ -35,6 +32,16 @@ def get_clock_pos(clock_dict, clock_hand):
     return x, y
 
 
+def shift_register():
+    for i in register:
+        if encoder == i[1]:
+            i[0] = True
+        if i[0] == True:
+            i[2] += 1
+            if i[2] == 360:
+                i[2] = 0
+
+
 pygame.font.init()
 font = pygame.font.SysFont('Comic Sans MS', 30)
 
@@ -47,43 +54,22 @@ while True:
     data = conn3.recv(70)
     surface.fill([235, 235, 235])
 
+    shift_register()
+
     if data == b'1':
-        i += 1
+        encoder += 1
 
-    if i == 120:
-        shift_j = True
-    
-    if i == 360:
-        i = 0
-
-    if shift_j:
-        j += 1
-
-    if j == 360:
-        j = 0
-
-    if i == 240:
-        shift_k = True  
-
-    if shift_k:
-        k += 1      
-
-    if k == 360:
-        k = 0
-
-    text1 = font.render(f'{str(i)}', True, (180, 0, 0))
-    text2 = font.render(f'{str(j)}', True, (180, 0, 0))
-    text3 = font.render(f'{str(k)}', True, (180, 0, 0))
-    surface.blit(text1, (20, 10))
-    surface.blit(text2, (340, 10))
-    surface.blit(text3, (20, 340))
+    text1 = font.render(f'{str(register[0][2])}', True, (180, 0, 0))
+    text2 = font.render(f'{str(register[1][2])}', True, (180, 0, 0))
+    text3 = font.render(f'{str(register[2][2])}', True, (180, 0, 0))
+    surface.blit(text1, (10, 10))
+    surface.blit(text2, (10, 40))
+    surface.blit(text3, (10, 70))
     
     pygame.draw.circle(surface, pygame.Color('darkslategray'), (H_WIDTH, H_HEIGHT), RADIUS)
     pygame.draw.line(surface, pygame.Color('green'), (H_WIDTH, H_HEIGHT), get_clock_pos(clock60, 0), 2)
-    pygame.draw.line(surface, pygame.Color('green'), (H_WIDTH, H_HEIGHT), get_clock_pos(clock60, 120), 2)
-    pygame.draw.line(surface, pygame.Color('green'), (H_WIDTH, H_HEIGHT), get_clock_pos(clock60, 240), 2)
-    pygame.draw.line(surface, pygame.Color('magenta'), (H_WIDTH, H_HEIGHT), get_clock_pos(clock60, i), 4)
-    pygame.draw.line(surface, pygame.Color('magenta'), (H_WIDTH, H_HEIGHT), get_clock_pos(clock60, j), 4)
-    pygame.draw.line(surface, pygame.Color('magenta'), (H_WIDTH, H_HEIGHT), get_clock_pos(clock60, k), 4)
+    pygame.draw.line(surface, pygame.Color('green'), (H_WIDTH, H_HEIGHT), get_clock_pos(clock60, 10), 2)
+    pygame.draw.line(surface, pygame.Color('green'), (H_WIDTH, H_HEIGHT), get_clock_pos(clock60, 20), 2)
+    pygame.draw.line(surface, pygame.Color('magenta'), (H_WIDTH, H_HEIGHT), get_clock_pos(clock60, register[0][2]), 4)
     
     pygame.display.flip()
