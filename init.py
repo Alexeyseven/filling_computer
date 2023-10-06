@@ -124,3 +124,4 @@ sectors = {10: 'CO2',
            100: 'fast_filling',
            270: 'press_reset',
            320: 'start_pos'}
+
