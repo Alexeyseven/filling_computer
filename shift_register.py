@@ -3,7 +3,7 @@ import math
 import time
 import socket
 import os
-from register import register
+from init import register
 
 
 RES = WIDTH, HEIGHT = 400, 400
