@@ -1,46 +1,18 @@
 import pygame
 import math
 import time
-import socket
-import os
 
 
 RES = WIDTH, HEIGHT = 400, 400
 H_WIDTH, H_HEIGHT = WIDTH // 2, HEIGHT // 2
 RADIUS = H_HEIGHT - 50
 
-sectors = {0: 'start_pos',
-           10: 'CO2',
-           60: 'slow_filling',
-           120: 'fast_filling',
-           310: 'press_reset',
-           340: 'start_pos'}
-
 pygame.init()
 surface = pygame.display.set_mode(RES)
-
 clock60 = dict(zip(range(360), range(0, 360, 1)))
 
-i = 0
-
-s = socket.socket()
-s.bind(('192.168.1.241', 2000))
-s.listen(3)
-
-os.system('start cmd /k python valve_1_2_3.py')
-os.system('start cmd /k python encoder.py')
-
-conn1, addr1 = s.accept()
-conn3, addr3 = s.accept()
-
-valves = [[0, conn1, 'valve_1'],
-          [120, conn1, 'valve_2'],
-          [240, conn1, 'valve_3']]
-
-
-def send_data(i, conn, valve):
-    if 360-i in sectors.keys():
-        conn.send(str.encode(f'{valve}'+'_'+f'{sectors[360-i]}'))
+i = 1
+j = 0
 
 
 def get_clock_pos(clock_dict, clock_hand):
@@ -49,8 +21,13 @@ def get_clock_pos(clock_dict, clock_hand):
     return x, y
 
 
+def diapason_transpole(max_vis, min_vis, max_rob, min_rob, coordinate):
+   return((max_rob-min_rob)*(coordinate-min_vis)/(max_vis-min_vis)+min_rob)
+
+
 pygame.font.init()
 font = pygame.font.SysFont('Comic Sans MS', 30)
+font_1 = pygame.font.SysFont('Comic Sans MS', 14)
 
 
 while True:
@@ -58,18 +35,40 @@ while True:
         if event.type == pygame.QUIT:
             exit()
 
-    data = conn3.recv(70)
     surface.fill([235, 235, 235])
-
-    i = int(data.decode('cp1251'))
-
-    for j in valves:
-        send_data(360-i+j[0], j[1], j[2])
-
-    text = font.render(f'{str(i)}', True, (180, 0, 0))
+    
+    j = int(diapason_transpole(360, 0, 1024, 0, i))
+    text = font.render(f'{str(j)}', True, (180, 0, 0))
     surface.blit(text, (20, 10))
+
+    CO2 = font_1.render('CO2', True, (0, 0, 255))
+    surface.blit(CO2, (220, 20))
+
+    slow_filling = font_1.render('slow_filling', True, (0, 0, 255))
+    surface.blit(slow_filling, (277, 50))
+
+    fast_filling = font_1.render('fast_filling', True, (0, 0, 255))
+    surface.blit(fast_filling, (287, 327))
+
+    press_reset = font_1.render('press_reset', True, (0, 0, 255))
+    surface.blit(press_reset, (2, 170))
+
+    start_pos = font_1.render('start_pos', True, (0, 0, 255))
+    surface.blit(start_pos, (20, 70))
     
     pygame.draw.circle(surface, pygame.Color('darkslategray'), (H_WIDTH, H_HEIGHT), RADIUS)
     pygame.draw.line(surface, pygame.Color('magenta'), (H_WIDTH, H_HEIGHT), get_clock_pos(clock60, i), 4)
+
+    pygame.draw.line(surface, pygame.Color('green'), (H_WIDTH, H_HEIGHT), get_clock_pos(clock60, 7), 2)
+    pygame.draw.line(surface, pygame.Color('orange'), (H_WIDTH, H_HEIGHT), get_clock_pos(clock60, 42), 2)
+    pygame.draw.line(surface, pygame.Color('red'), (H_WIDTH, H_HEIGHT), get_clock_pos(clock60, 140), 2)
+    pygame.draw.line(surface, pygame.Color('blue'), (H_WIDTH, H_HEIGHT), get_clock_pos(clock60, 281), 2)
+    pygame.draw.line(surface, pygame.Color('gray'), (H_WIDTH, H_HEIGHT), get_clock_pos(clock60, 316), 2)
+    
+    i += 1
+    if i == 360:
+        i = 0
+    time.sleep(0.02747)
     
     pygame.display.flip()
+    
